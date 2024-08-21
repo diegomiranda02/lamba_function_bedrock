@@ -41,6 +41,7 @@ jobs:
         aws lambda update-function-code \
           --function-name lamba_function_bedrock \
           --zip-file fileb://function.zip
+          --debug
 
     - name: Run Lambda function test
       env:
@@ -48,7 +49,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
         aws lambda invoke \
-          --function-name your-lambda-function-name \
+          --function-name lamba_function_bedrock \
           --payload '{}' \
           output.txt
         cat output.txt
