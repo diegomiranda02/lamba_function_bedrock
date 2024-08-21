@@ -48,16 +48,16 @@ jobs:
 
     - name: Run Lambda function test
       env:
-    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  run: |
-    aws lambda invoke \
-      --function-name lambda_function_bedrock \
-      --payload '{}' \
-      --log-type Tail \
-      output.txt > result.log
-    cat result.log
-    cat output.txt
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+        aws lambda invoke \
+          --function-name lambda_function_bedrock \
+          --payload '{}' \
+          --log-type Tail \
+          output.txt > result.log
+        cat result.log
+        cat output.txt
 
   test:
     needs: deploy
