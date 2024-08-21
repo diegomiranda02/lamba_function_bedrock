@@ -41,7 +41,9 @@ jobs:
         aws lambda update-function-code \
           --function-name lamba_function_bedrock \
           --zip-file fileb://function.zip
-          --debug
+          --debug | tee debug.log
+        echo "Debug log:"
+        cat debug.log
 
     - name: Run Lambda function test
       env:
