@@ -28,7 +28,7 @@ jobs:
 
     - name: Package Lambda function
       run: |
-        cp -r ./src/* ./package/
+        cp -r ./src/* ./package/ || echo "No src directory, skipping"
         cd package
         zip -r ../function.zip .
         cd ..
@@ -38,10 +38,11 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
+        set -o pipefail
         aws lambda update-function-code \
-          --function-name lamba_function_bedrock \
-          --zip-file fileb://function.zip
-          --debug | tee debug.log
+          --function-name lambda_function_bedrock \
+          --zip-file fileb://function.zip \
+          --debug 2>&1 | tee debug.log
         echo "Debug log:"
         cat debug.log
 
@@ -51,7 +52,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
         aws lambda invoke \
-          --function-name lamba_function_bedrock \
+          --function-name lambda_function_bedrock \
           --payload '{}' \
           output.txt
         cat output.txt
@@ -64,7 +65,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.12'
 
     - name: Install dependencies
       run: |
