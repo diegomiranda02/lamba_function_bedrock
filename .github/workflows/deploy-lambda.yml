@@ -19,7 +19,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.12'
 
     - name: Install dependencies
       run: |
@@ -39,7 +39,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
         aws lambda update-function-code \
-          --function-name your-lambda-function-name \
+          --function-name lamba_function_bedrock \
           --zip-file fileb://function.zip
 
     - name: Run Lambda function test
