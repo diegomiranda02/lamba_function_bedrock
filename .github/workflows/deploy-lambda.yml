@@ -13,93 +13,93 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt -t ./package
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -t ./package
 
-    - name: Package Lambda function
-      run: |
-        cp -r ./src/* ./package/ || echo "No src directory, skipping"
-        cd package
-        zip -r ../function.zip .
-        cd ..
+      - name: Package Lambda function
+        run: |
+          cp -r ./src/* ./package/ || echo "No src directory, skipping"
+          cd package
+          zip -r ../function.zip .
+          cd ..
 
-    - name: Deploy Lambda function
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      run: |
-        aws lambda update-function-code \
-          --function-name lambda_function_bedrock \
-          --zip-file fileb://function.zip \
-          --region us-east-1 \
-          --debug 2>&1 | tee debug.log
-        echo "Debug log:"
-        cat debug.log
+      - name: Deploy Lambda function
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws lambda update-function-code \
+            --function-name lambda_function_bedrock \
+            --zip-file fileb://function.zip \
+            --region us-east-1 \
+            --debug 2>&1 | tee debug.log
+          echo "Debug log:"
+          cat debug.log
 
-    - name: Run Lambda function test - Step 1: Invoke Lambda
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      run: |
-        set -o pipefail
-        echo "Invoking Lambda function..."
-        aws lambda invoke \
-          --function-name lambda_function_bedrock \
-          --payload '{\"body\": \"{\\\"model_id\\\": \\\"meta.llama3-70b-instruct-v1:0\\\", \\\"params\\\": {\\\"prompt\\\": \\\"Which mode are you?\\\", \\\"max_gen_len\\\": 512, \\\"temperature\\\": 0.5, \\\"top_p\\\": 0.9}}\"}' \
-          --log-type Tail \
-          --region us-east-1 \
-          output.txt 2> error.log | tee result.log
+      - name: Run Lambda function test - Step 1: Invoke Lambda
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          set -o pipefail
+          echo "Invoking Lambda function..."
+          aws lambda invoke \
+            --function-name lambda_function_bedrock \
+            --payload '{\"body\": \"{\\\"model_id\\\": \\\"meta.llama3-70b-instruct-v1:0\\\", \\\"params\\\": {\\\"prompt\\\": \\\"Which mode are you?\\\", \\\"max_gen_len\\\": 512, \\\"temperature\\\": 0.5, \\\"top_p\\\": 0.9}}\"}' \
+            --log-type Tail \
+            --region us-east-1 \
+            output.txt 2> error.log | tee result.log
 
-    - name: Run Lambda function test - Step 2: Check Invocation Results
-      run: |
-        echo "Checking Lambda function logs..."
-        if [ -s result.log ]; then
-          cat result.log
-        else
-          echo "No result.log generated"
-        fi
-        
-        echo "Checking Lambda function output..."
-        if [ -s output.txt ]; then
-          cat output.txt
-        else
-          echo "No output.txt generated"
-        fi
-        
-        echo "Checking Lambda function errors..."
-        if [ -s error.log ]; then
-          echo "Errors detected:"
-          cat error.log
-        else
-          echo "No error.log generated"
-        fi
+      - name: Run Lambda function test - Step 2: Check Invocation Results
+        run: |
+          echo "Checking Lambda function logs..."
+          if [ -s result.log ]; then
+            cat result.log
+          else
+            echo "No result.log generated"
+          fi
+          
+          echo "Checking Lambda function output..."
+          if [ -s output.txt ]; then
+            cat output.txt
+          else
+            echo "No output.txt generated"
+          fi
+          
+          echo "Checking Lambda function errors..."
+          if [ -s error.log ]; then
+            echo "Errors detected:"
+            cat error.log
+          else
+            echo "No error.log generated"
+          fi
 
   test:
     needs: deploy
     runs-on: ubuntu-latest
 
     steps:
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Run unit tests with detailed output
-      run: |
-        echo "Running unit tests with pytest..."
-        pytest --verbose --capture=tee-sys --tb=short
+      - name: Run unit tests with detailed output
+        run: |
+          echo "Running unit tests with pytest..."
+          pytest --verbose --capture=tee-sys --tb=short
