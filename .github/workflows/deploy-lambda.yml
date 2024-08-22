@@ -54,18 +54,10 @@ jobs:
         set -o pipefail
         aws lambda invoke \
           --function-name lambda_function_bedrock \
-          --payload '{
-                  "model_id": "meta.llama3-70b-instruct-v1:0",
-                  "params": {
-                      "prompt": 'Which mode are you?',
-                      "max_gen_len": 512,
-                      "temperature": 0.5,
-                      "top_p": 0.9
-                  }
-              }' \
+          --payload '{\"body\": \"{\\\"model_id\\\": \\\"meta.llama3-70b-instruct-v1:0\\\", \\\"params\\\": {\\\"prompt\\\": \\\"Which mode are you?\\\", \\\"max_gen_len\\\": 512, \\\"temperature\\\": 0.5, \\\"top_p\\\": 0.9}}\"}' \
           --log-type Tail \
           --region us-east-1 \
-          --debug output.txt 2> error.log | tee result.log
+          output.txt 2> error.log | tee result.log
         echo "Lambda function logs:"
         cat result.log
         echo "Lambda function output:"
