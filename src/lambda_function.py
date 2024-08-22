@@ -17,20 +17,12 @@ def model_invocation(model_id: str, params: dict) -> str:
             contentType="application/json"
         )
         
-        print("RESPONSE")
-        
-        print(response)
-        
         response_content = response['body'].read()
-        print("RESPONSE CONTENT")
-        print(response_content)
-        
         response_data = json.loads(response_content)
-        print("RESPONSE DATA ---------------------")
-        print("Response Data:", response_data)
         
         # Access the generated text correctly from the response structure
         result = response_data.get('generation', '')
+        print("Result:" + str(result))
         return result
         
     except Exception as e:
