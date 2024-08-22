@@ -60,10 +60,10 @@ jobs:
             --region us-east-1 \
             output_test.txt 2> error_test.log | tee result_test.log
 
-          if [ -s output_test.txt ]; then
+          if [ -s result_test.log ]; then
             echo "Integration test passed!"
             cat output_test.txt
           else
-            echo "Integration test failed. No output produced."
+            echo "Integration test failed. No result_test.log produced."
             exit 1
           fi
