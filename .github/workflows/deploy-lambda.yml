@@ -43,37 +43,25 @@ jobs:
           cat debug.log
 
   test:
-    needs: deploy
     runs-on: ubuntu-latest
 
     steps:
-      - name: Integration Test
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          echo "Running integration test..."
-          aws lambda invoke \
-            --function-name lambda_function_bedrock \
-            --payload '{\"body\": \"{\\\"model_id\\\": \\\"meta.llama3-70b-instruct-v1:0\\\", \\\"params\\\": {\\\"prompt\\\": \\\"Integration test prompt\\\", \\\"max_gen_len\\\": 512, \\\"temperature\\\": 0.7, \\\"top_p\\\": 0.9}}\"}' \
-            --log-type Tail \
-            --region us-east-1 \
-            output_test.txt 2> error_test.log | tee result_test.log
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-          if [ -s result_test.log ]; then
-            echo "Integration test passed!"
-            echo "output_text.txt content"
-            cat output_test.txt
-            echo "result_test.log content"
-            cat result_test.log
-          else
-            echo "Integration test failed. No result_test.log produced."
-            echo "output_text.txt content"
-            cat output_test.txt
-            echo "result_test.log content"
-            cat result_test.log
-            echo "error_test.log content"
-            cat error_test.log
-            
-            exit 1
-          fi
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'  # Use the Python version your script requires
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+
+    - name: Run Lambda Function Test
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+        python test_lambda_function.py
