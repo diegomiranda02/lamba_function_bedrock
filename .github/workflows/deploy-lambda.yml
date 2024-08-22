@@ -56,7 +56,8 @@ jobs:
           --function-name lambda_function_bedrock \
           --payload '{}' \
           --log-type Tail \
-          output.txt 2> error.log | tee result.log
+          --region us-east-1 \
+          --debug output.txt 2> error.log | tee result.log
         echo "Lambda function logs:"
         cat result.log
         echo "Lambda function output:"
