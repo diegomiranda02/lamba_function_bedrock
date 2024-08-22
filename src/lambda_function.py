@@ -23,6 +23,7 @@ def model_invocation(model_id: str, params: dict) -> str:
         # Access the generated text correctly from the response structure
         result = response_data.get('generation', '')
         print("Result:" + str(result))
+        
         return result
         
     except Exception as e:
