@@ -43,6 +43,7 @@ jobs:
           cat debug.log
 
   test:
+    needs: deploy
     runs-on: ubuntu-latest
 
     steps:
