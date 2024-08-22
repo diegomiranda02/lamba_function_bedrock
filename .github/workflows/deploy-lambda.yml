@@ -62,8 +62,18 @@ jobs:
 
           if [ -s result_test.log ]; then
             echo "Integration test passed!"
+            echo "output_text.txt content"
             cat output_test.txt
+            echo "result_test.log content"
+            cat result_test.log
           else
             echo "Integration test failed. No result_test.log produced."
+            echo "output_text.txt content"
+            cat output_test.txt
+            echo "result_test.log content"
+            cat result_test.log
+            echo "error_test.log content"
+            cat error_test.log
+            
             exit 1
           fi
