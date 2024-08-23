@@ -1,11 +1,3 @@
-terraform {
-  backend "s3" {
-    bucket         = "glpi-bedrock-project-terraform-state"   # Your S3 bucket name
-    key            = "path/to/terraform.tfstate"              # Path within the bucket to store the state file
-    region         = "us-east-1"                              # AWS region of the S3 bucket
-  }
-}
-
 # Create IAM role for Lambda
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda_exec_role"
