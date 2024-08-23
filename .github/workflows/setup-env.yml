@@ -1,0 +1,20 @@
+name: Setup Environment
+
+on:
+  workflow_call:
+    outputs:
+      S3_BUCKET:
+        description: 'S3 Bucket Name'
+      S3_KEY_PATH:
+        description: 'S3 Key Path'
+
+jobs:
+  set_env:
+    runs-on: ubuntu-latest
+    outputs:
+      S3_BUCKET: glpi-bedrock-project-terraform-state
+      S3_KEY_PATH: path/to/${{ github.repository }}
+    steps:
+      - name: Set Outputs
+        run: echo "S3_BUCKET=glpi-bedrock-project-terraform-state" >> $GITHUB_ENV
+        run: echo "S3_KEY_PATH=path/to/${{ github.repository }}" >> $GITHUB_ENV
