@@ -1,6 +1,8 @@
 terraform {
-  backend "local" {
-    path = "terraform.tfstate"
+  backend "s3" {
+    bucket         = "glpi-bedrock-project-terraform-state"   # Your S3 bucket name
+    key            = "path/to/terraform.tfstate"              # Path within the bucket to store the state file
+    region         = "us-east-1"                              # AWS region of the S3 bucket
   }
 }
 
