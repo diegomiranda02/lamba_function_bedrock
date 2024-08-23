@@ -22,9 +22,11 @@ jobs:
         run: echo "PROJECT_NAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)" >> $GITHUB_ENV
 
       - name: Initialize Terraform
-        run: terraform init -backend-config="key=${PROJECT_NAME}/terraform.tfstate" \
-                            -backend-config="bucket=glpi-bedrock-project-terraform-state" \
-                            -backend-config="region=${AWS_REGION}"
+        run: |
+          terraform init \
+            -backend-config="key=${PROJECT_NAME}/terraform.tfstate" \
+            -backend-config="bucket=glpi-bedrock-project-terraform-state" \
+            -backend-config="region=${AWS_REGION}"
         working-directory: ./terraform
 
       - name: Validate Terraform Configuration
