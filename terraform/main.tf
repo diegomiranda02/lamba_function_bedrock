@@ -41,7 +41,7 @@ resource "aws_iam_role_policy" "lambda_bedrock_policy" {
 # Zip the lambda function code
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_dir  = "${path.module}/src"
+  source_dir  = "${path.module}/../src"
   output_path = "${path.module}/lambda_function.zip"
 }
 
