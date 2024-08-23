@@ -6,6 +6,11 @@ on:
 jobs:
   create:
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -14,17 +19,17 @@ jobs:
         uses: hashicorp/setup-terraform@v2
 
       - name: Initialize Terraform
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
         run: terraform init
         working-directory: ./terraform
 
+      - name: Validate Terraform Configuration
+        run: terraform validate
+        working-directory: ./terraform
+
+      - name: Plan Terraform Deployment
+        run: terraform plan -out=terraform.plan
+        working-directory: ./terraform
+
       - name: Apply Terraform to create resources
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve terraform.plan
         working-directory: ./terraform
