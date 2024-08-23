@@ -1,5 +1,7 @@
-provider "aws" {
-  region = "us-east-1"
+terraform {
+  backend "local" {
+    path = "terraform/terraform.tfstate"
+  }
 }
 
 # Create IAM role for Lambda
