@@ -1,3 +1,7 @@
+terraform {
+  backend "s3" {}
+}
+
 # Create IAM role for Lambda
 resource "aws_iam_role" "lambda_exec_role" {
   name = "lambda_exec_role"
