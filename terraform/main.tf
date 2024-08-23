@@ -1,3 +1,5 @@
+# main.tf
+
 terraform {
   backend "s3" {}
 }
@@ -47,22 +49,16 @@ data "archive_file" "lambda_zip" {
 
 resource "aws_lambda_function" "lambda_function" {
   filename         = data.archive_file.lambda_zip.output_path
-  function_name    = "lambda_function_bedrock"
+  function_name    = var.lambda_function_name  # Use variable
   role             = aws_iam_role.lambda_exec_role.arn
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.12"
   source_code_hash = filebase64sha256(data.archive_file.lambda_zip.output_path)
-
-  environment {
-    variables = {
-      BEDROCK_MODEL_ID = "meta.llama3-70b-instruct-v1:0"
-    }
-  }
 }
 
 # Create API Gateway
 resource "aws_apigatewayv2_api" "api_gateway" {
-  name          = "llm_test"
+  name          = var.api_gateway_name  # Use variable
   protocol_type = "HTTP"
 }
 
@@ -83,7 +79,7 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
 # Deploy API
 resource "aws_apigatewayv2_stage" "api_stage" {
   api_id      = aws_apigatewayv2_api.api_gateway.id
-  name        = "dev"
+  name        = var.api_stage_name  # Use variable
   auto_deploy = true
 }
 
@@ -91,7 +87,7 @@ resource "aws_apigatewayv2_stage" "api_stage" {
 resource "aws_lambda_permission" "apigw_lambda_permission" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda_function.function_name
+  function_name = aws_lambda_function.lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.api_gateway.execution_arn}/*/*"
 }
