@@ -1,7 +1,7 @@
+import os
 import requests
 
-def already_response_function(prompt: str):
-    url = "https://flswf0fipd.execute-api.us-east-1.amazonaws.com/dev/model-invocation"  # Replace with your actual endpoint URL
+def already_response_function(prompt: str, url: str):
     headers = {
         "Content-Type": "application/json"
     }
@@ -32,6 +32,10 @@ def already_response_function(prompt: str):
         return f"Error: {response.status_code}, {response.text}"
 
 def test_already_response_1():
+    url = os.getenv("API_ENDPOINT")  # Get the endpoint URL from the environment variable
+    if not url:
+        raise ValueError("API_ENDPOINT environment variable is not set.")
+    
     prompt = ("""
     Você é um classificador de chamados do sistema de gerenciamento de chamados GLPI. Classifique o chamado em categoria e subcategoria de acordo com as seguintes opções:
 
@@ -63,10 +67,10 @@ def test_already_response_1():
 
     ```json
     {"category": "", "subcategory": ""}
+    ```
+    """
 
-    """)
-
-    already_response = already_response_function(prompt)
+    already_response = already_response_function(prompt, url)
 
     print(f"Prompt: {prompt}")
     print(f"Already Response: {already_response}")
