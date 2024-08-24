@@ -16,6 +16,8 @@ jobs:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       S3_BUCKET: ${{ needs.setup_env.outputs.S3_BUCKET }}
       S3_KEY_PATH: ${{ needs.setup_env.outputs.S3_KEY_PATH }}
+      API_GATEWAY_NAME: ${{ needs.setup_env.outputs.API_GATEWAY_NAME }}
+      API_STAGE_NAME: ${{ needs.setup_env.outputs.API_STAGE_NAME }}
 
     steps:
       - name: Checkout code
