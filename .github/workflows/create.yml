@@ -39,5 +39,3 @@ jobs:
         run: |
           echo $API_ENDPOINT > api_endpoint.txt
           aws s3 cp api_endpoint.txt s3://${S3_BUCKET}/${S3_KEY_PATH}/api_endpoint.txt
-        env:
-          API_ENDPOINT: ${{ steps.create_output.outputs.api_endpoint }}
