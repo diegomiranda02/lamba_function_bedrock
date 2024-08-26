@@ -1,4 +1,4 @@
-name: Delete Resources
+name: Create Resources
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ jobs:
   setup_env:
     uses: ./.github/workflows/setup-env.yml
 
-  delete:
+  create:
     needs: setup_env
     runs-on: ubuntu-latest
     env:
@@ -16,6 +16,8 @@ jobs:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       S3_BUCKET: ${{ needs.setup_env.outputs.S3_BUCKET }}
       S3_KEY_PATH: ${{ needs.setup_env.outputs.S3_KEY_PATH }}
+      API_GATEWAY_NAME: ${{ needs.setup_env.outputs.API_GATEWAY_NAME }}
+      API_STAGE_NAME: ${{ needs.setup_env.outputs.API_STAGE_NAME }}
 
     steps:
       - name: Checkout code
@@ -29,6 +31,11 @@ jobs:
             -backend-config="region=${AWS_REGION}"
         working-directory: ./terraform
 
-      - name: Destroy Resources
-        run: terraform destroy -auto-approve
+      - name: Apply Terraform to create resources
+        run: terraform apply -auto-approve
         working-directory: ./terraform
+
+      - name: Save API Endpoint to S3
+        run: |
+          echo $API_ENDPOINT > api_endpoint.txt
+          aws s3 cp api_endpoint.txt s3://${S3_BUCKET}/${S3_KEY_PATH}/api_endpoint.txt
