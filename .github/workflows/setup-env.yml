@@ -2,19 +2,15 @@ name: Setup Environment
 
 on:
   workflow_call:
-    outputs:
-      S3_BUCKET:
-        description: 'S3 Bucket Name'
-      S3_KEY_PATH:
-        description: 'S3 Key Path'
-      API_GATEWAY_NAME:
-        description: 'API Gateway Name'
-      API_STAGE_NAME:
-        description: 'API Stage Name'
 
 jobs:
   set_env:
     runs-on: ubuntu-latest
+    outputs:
+      S3_BUCKET: ${{ steps.set_outputs.outputs.S3_BUCKET }}
+      S3_KEY_PATH: ${{ steps.set_outputs.outputs.S3_KEY_PATH }}
+      API_GATEWAY_NAME: ${{ steps.set_outputs.outputs.API_GATEWAY_NAME }}
+      API_STAGE_NAME: ${{ steps.set_outputs.outputs.API_STAGE_NAME }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -41,12 +37,10 @@ jobs:
       - name: Set Workflow Outputs
         id: set_outputs
         run: |
-          echo "S3_BUCKET=glpi-bedrock-project-terraform-state" >> $GITHUB_ENV
-          echo "S3_KEY_PATH=${PROJECT_NAME}" >> $GITHUB_ENV
+          S3_BUCKET="glpi-bedrock-project-terraform-state"
+          S3_KEY_PATH="${PROJECT_NAME}"
 
-      - name: Output Variables
-        run: |
-          echo "::set-output name=S3_BUCKET::${{ env.S3_BUCKET }}"
-          echo "::set-output name=S3_KEY_PATH::${{ env.S3_KEY_PATH }}"
-          echo "::set-output name=API_GATEWAY_NAME::${{ env.API_GATEWAY_NAME }}"
-          echo "::set-output name=API_STAGE_NAME::${{ env.API_STAGE_NAME }}"
+          echo "::set-output name=S3_BUCKET::$S3_BUCKET"
+          echo "::set-output name=S3_KEY_PATH::$S3_KEY_PATH"
+          echo "::set-output name=API_GATEWAY_NAME::$API_GATEWAY_NAME"
+          echo "::set-output name=API_STAGE_NAME::$API_STAGE_NAME"
