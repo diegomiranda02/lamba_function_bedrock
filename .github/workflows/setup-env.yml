@@ -5,12 +5,16 @@ on:
     outputs:
       S3_BUCKET:
         description: 'S3 Bucket Name'
+        value: ${{ steps.set_outputs.outputs.S3_BUCKET }}  # Add this
       S3_KEY_PATH:
         description: 'S3 Key Path'
+        value: ${{ steps.set_outputs.outputs.S3_KEY_PATH }}  # Add this
       API_GATEWAY_NAME:
         description: 'API Gateway Name'
+        value: ${{ steps.set_outputs.outputs.API_GATEWAY_NAME }}  # Add this
       API_STAGE_NAME:
         description: 'API Stage Name'
+        value: ${{ steps.set_outputs.outputs.API_STAGE_NAME }}  # Add this
 
 jobs:
   set_env:
@@ -34,7 +38,7 @@ jobs:
         run: |
           API_GATEWAY_NAME=$(terraform output -raw api_gateway_name)
           API_STAGE_NAME=$(terraform output -raw api_stage_name)
-          
+
           echo "API_GATEWAY_NAME=$API_GATEWAY_NAME" >> $GITHUB_ENV
           echo "API_STAGE_NAME=$API_STAGE_NAME" >> $GITHUB_ENV
         working-directory: ./terraform
@@ -49,4 +53,3 @@ jobs:
           echo "::set-output name=S3_KEY_PATH::$S3_KEY_PATH"
           echo "::set-output name=API_GATEWAY_NAME::$API_GATEWAY_NAME"
           echo "::set-output name=API_STAGE_NAME::$API_STAGE_NAME"
-
