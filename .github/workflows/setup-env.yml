@@ -5,16 +5,12 @@ on:
     outputs:
       S3_BUCKET:
         description: 'S3 Bucket Name'
-        value: ${{ steps.set_outputs.outputs.S3_BUCKET }}  # Add this
       S3_KEY_PATH:
         description: 'S3 Key Path'
-        value: ${{ steps.set_outputs.outputs.S3_KEY_PATH }}  # Add this
       API_GATEWAY_NAME:
         description: 'API Gateway Name'
-        value: ${{ steps.set_outputs.outputs.API_GATEWAY_NAME }}  # Add this
       API_STAGE_NAME:
         description: 'API Stage Name'
-        value: ${{ steps.set_outputs.outputs.API_STAGE_NAME }}  # Add this
 
 jobs:
   set_env:
@@ -41,15 +37,16 @@ jobs:
 
           echo "API_GATEWAY_NAME=$API_GATEWAY_NAME" >> $GITHUB_ENV
           echo "API_STAGE_NAME=$API_STAGE_NAME" >> $GITHUB_ENV
-        working-directory: ./terraform
 
       - name: Set Workflow Outputs
         id: set_outputs
         run: |
-          S3_BUCKET="glpi-bedrock-project-terraform-state"
-          S3_KEY_PATH="${PROJECT_NAME}"
+          echo "S3_BUCKET=glpi-bedrock-project-terraform-state" >> $GITHUB_ENV
+          echo "S3_KEY_PATH=${PROJECT_NAME}" >> $GITHUB_ENV
 
-          echo "::set-output name=S3_BUCKET::$S3_BUCKET"
-          echo "::set-output name=S3_KEY_PATH::$S3_KEY_PATH"
-          echo "::set-output name=API_GATEWAY_NAME::$API_GATEWAY_NAME"
-          echo "::set-output name=API_STAGE_NAME::$API_STAGE_NAME"
+      - name: Output Variables
+        run: |
+          echo "::set-output name=S3_BUCKET::${{ env.S3_BUCKET }}"
+          echo "::set-output name=S3_KEY_PATH::${{ env.S3_KEY_PATH }}"
+          echo "::set-output name=API_GATEWAY_NAME::${{ env.API_GATEWAY_NAME }}"
+          echo "::set-output name=API_STAGE_NAME::${{ env.API_STAGE_NAME }}"
