@@ -1,9 +1,5 @@
 terraform {
-  backend "s3" {
-    bucket = var.s3_bucket
-    key    = "${var.s3_key_path}/terraform.tfstate"
-    region = var.aws_region
-  }
+  backend "s3" {}
 }
 
 # Create IAM role for Lambda
