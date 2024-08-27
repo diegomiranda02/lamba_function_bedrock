@@ -18,7 +18,11 @@ jobs:
         uses: hashicorp/setup-terraform@v2
 
       - name: Source Environment Variables
-        run: source .github/workflows/env.sh
+        run: |
+          source .github/workflows/env.sh
+          echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
+          echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
+        shell: bash
 
       - name: Debug Environment Variables
         run: |
