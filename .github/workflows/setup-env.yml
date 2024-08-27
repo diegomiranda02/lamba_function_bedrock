@@ -13,21 +13,20 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+
       - name: Source environment variables from env.sh
         id: source_env
         run: |
           source .github/workflows/env.sh
           echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
           echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
-      
+
       - name: Extract Project Name
         id: extract_project_name
         run: |
           PROJECT_NAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
           echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
-          echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_OUTPUT
-      
+
       - name: Set Workflow Outputs
         id: set_outputs
         run: |
@@ -35,3 +34,9 @@ jobs:
           echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_OUTPUT
           echo "S3_KEY_PATH=$S3_KEY_PATH" >> $GITHUB_OUTPUT
           echo "AWS_REGION=$AWS_REGION" >> $GITHUB_OUTPUT
+
+      - name: Debugging
+        run: |
+          echo "AWS_REGION: $AWS_REGION"
+          echo "S3_BUCKET: $S3_BUCKET"
+          echo "S3_KEY_PATH: $S3_KEY_PATH"
