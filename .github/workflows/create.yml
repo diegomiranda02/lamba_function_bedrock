@@ -10,28 +10,17 @@ jobs:
   create:
     needs: setup_env
     runs-on: ubuntu-latest
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      S3_BUCKET: ${{ needs.setup_env.outputs.S3_BUCKET }}
-      S3_KEY_PATH: ${{ needs.setup_env.outputs.S3_KEY_PATH }}
-      API_GATEWAY_NAME: ${{ needs.setup_env.outputs.API_GATEWAY_NAME }}
-      API_STAGE_NAME: ${{ needs.setup_env.outputs.API_STAGE_NAME }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Load Environment Variables
-        run: source .github/workflows/env.sh
-
       - name: Initialize Terraform
         run: |
           terraform init \
-            -backend-config="key=${S3_KEY_PATH}/terraform.tfstate" \
-            -backend-config="bucket=${S3_BUCKET}" \
-            -backend-config="region=${AWS_REGION}"
+            -backend-config="key=${{ needs.setup_env.outputs.S3_KEY_PATH }}/terraform.tfstate" \
+            -backend-config="bucket=${{ needs.setup_env.outputs.S3_BUCKET }}" \
+            -backend-config="region=${{ env.AWS_REGION }}"
         working-directory: ./terraform
 
       - name: Apply Terraform to create resources
@@ -41,4 +30,4 @@ jobs:
       - name: Save API Endpoint to S3
         run: |
           echo $API_ENDPOINT > api_endpoint.txt
-          aws s3 cp api_endpoint.txt s3://${S3_BUCKET}/${S3_KEY_PATH}/api_endpoint.txt
+          aws s3 cp api_endpoint.txt s3://${{ needs.setup_env.outputs.S3_BUCKET }}/${{ needs.setup_env.outputs.S3_KEY_PATH }}/api_endpoint.txt
