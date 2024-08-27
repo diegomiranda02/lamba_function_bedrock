@@ -15,6 +15,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Source environment variables from env.sh
+        id: source_env
+        run: |
+          source .github/workflows/env.sh
+          echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
+          echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
+
       - name: Extract Project Name
         id: extract_project_name
         run: |
@@ -37,7 +44,6 @@ jobs:
       - name: Set Workflow Outputs
         id: set_outputs
         run: |
-          S3_BUCKET="glpi-bedrock-project-terraform-state"
           S3_KEY_PATH="${PROJECT_NAME}"
 
           echo "::set-output name=S3_BUCKET::$S3_BUCKET"
