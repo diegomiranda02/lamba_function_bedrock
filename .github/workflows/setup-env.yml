@@ -1,6 +1,8 @@
 name: Setup Environment
+
 on:
   workflow_call:
+
 jobs:
   set_env:
     runs-on: ubuntu-latest
@@ -16,13 +18,14 @@ jobs:
         id: source_env
         run: |
           source .github/workflows/env.sh
-          echo "AWS_REGION=$AWS_REGION" >> $GITHUB_OUTPUT
-          echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_OUTPUT
+          echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
+          echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
       
       - name: Extract Project Name
         id: extract_project_name
         run: |
           PROJECT_NAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
+          echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
           echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_OUTPUT
       
       - name: Set Workflow Outputs
