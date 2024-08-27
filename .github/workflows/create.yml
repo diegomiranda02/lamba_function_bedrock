@@ -1,35 +1,39 @@
 name: Create Resources
+
 on:
   workflow_dispatch:
+
 jobs:
-  setup_env:
-    uses: ./.github/workflows/setup-env.yml
   create:
-    needs: setup_env
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-        
+
+      - name: Source Environment Variables from env.sh
+        run: |
+          source .github/workflows/env.sh
+          echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
+          echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
+
       - name: Debugging
         run: |
-          echo "AWS_REGION: ${{ needs.setup_env.outputs.AWS_REGION }}"
-          echo "S3_BUCKET: ${{ needs.setup_env.outputs.S3_BUCKET }}"
-          echo "S3_KEY_PATH: ${{ needs.setup_env.outputs.S3_KEY_PATH }}"
+          echo "AWS_REGION: $AWS_REGION"
+          echo "S3_BUCKET: $S3_BUCKET"
       
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ needs.setup_env.outputs.AWS_REGION }}
+          aws-region: $AWS_REGION
 
       - name: Initialize Terraform
         run: |
           terraform init \
-            -backend-config="key=${{ needs.setup_env.outputs.S3_KEY_PATH }}/terraform.tfstate" \
-            -backend-config="bucket=${{ needs.setup_env.outputs.S3_BUCKET }}" \
-            -backend-config="region=${{ needs.setup_env.outputs.AWS_REGION }}"  \
+            -backend-config="key=${S3_KEY_PATH}/terraform.tfstate" \
+            -backend-config="bucket=${S3_BUCKET}" \
+            -backend-config="region=${AWS_REGION}"  \
             -input=false
         working-directory: ./terraform
       
@@ -41,5 +45,5 @@ jobs:
         run: |
           API_ENDPOINT=$(terraform output -raw api_endpoint)
           echo $API_ENDPOINT > api_endpoint.txt
-          aws s3 cp api_endpoint.txt s3://${{ needs.setup_env.outputs.S3_BUCKET }}/${{ needs.setup_env.outputs.S3_KEY_PATH }}/api_endpoint.txt
+          aws s3 cp api_endpoint.txt s3://${S3_BUCKET}/${S3_KEY_PATH}/api_endpoint.txt
         working-directory: ./terraform
