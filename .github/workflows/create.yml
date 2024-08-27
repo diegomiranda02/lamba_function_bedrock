@@ -20,6 +20,11 @@ jobs:
       - name: Source Environment Variables
         run: source .github/workflows/env.sh
 
+      - name: Debug Environment Variables
+        run: |
+          echo "S3_BUCKET=${S3_BUCKET}"
+          echo "AWS_REGION=${AWS_REGION}"
+
       - name: Extract Project Name
         run: echo "PROJECT_NAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)" >> $GITHUB_ENV
 
