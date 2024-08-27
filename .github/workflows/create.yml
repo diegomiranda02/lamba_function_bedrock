@@ -1,40 +1,45 @@
 name: Create Resources
-
 on:
   workflow_dispatch:
-
 jobs:
   setup_env:
     uses: ./.github/workflows/setup-env.yml
-
   create:
     needs: setup_env
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         
       - name: Debugging
         run: |
-          echo "AWS_REGION: ${{ env.AWS_REGION }}"
+          echo "AWS_REGION: ${{ needs.setup_env.outputs.AWS_REGION }}"
           echo "S3_BUCKET: ${{ needs.setup_env.outputs.S3_BUCKET }}"
           echo "S3_KEY_PATH: ${{ needs.setup_env.outputs.S3_KEY_PATH }}"
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ needs.setup_env.outputs.AWS_REGION }}
 
       - name: Initialize Terraform
         run: |
           terraform init \
             -backend-config="key=${{ needs.setup_env.outputs.S3_KEY_PATH }}/terraform.tfstate" \
             -backend-config="bucket=${{ needs.setup_env.outputs.S3_BUCKET }}" \
-            -backend-config="region=${{ env.AWS_REGION }}"  \
+            -backend-config="region=${{ needs.setup_env.outputs.AWS_REGION }}"  \
             -input=false
         working-directory: ./terraform
-
+      
       - name: Apply Terraform to create resources
         run: terraform apply -auto-approve
         working-directory: ./terraform
-
+      
       - name: Save API Endpoint to S3
         run: |
+          API_ENDPOINT=$(terraform output -raw api_endpoint)
           echo $API_ENDPOINT > api_endpoint.txt
           aws s3 cp api_endpoint.txt s3://${{ needs.setup_env.outputs.S3_BUCKET }}/${{ needs.setup_env.outputs.S3_KEY_PATH }}/api_endpoint.txt
+        working-directory: ./terraform
