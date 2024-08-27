@@ -14,13 +14,20 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        
+      - name: Debugging
+        run: |
+          echo "AWS_REGION: ${{ env.AWS_REGION }}"
+          echo "S3_BUCKET: ${{ needs.setup_env.outputs.S3_BUCKET }}"
+          echo "S3_KEY_PATH: ${{ needs.setup_env.outputs.S3_KEY_PATH }}"
 
       - name: Initialize Terraform
         run: |
           terraform init \
             -backend-config="key=${{ needs.setup_env.outputs.S3_KEY_PATH }}/terraform.tfstate" \
             -backend-config="bucket=${{ needs.setup_env.outputs.S3_BUCKET }}" \
-            -backend-config="region=${{ env.AWS_REGION }}"
+            -backend-config="region=${{ env.AWS_REGION }}"  \
+            -input=false
         working-directory: ./terraform
 
       - name: Apply Terraform to create resources
