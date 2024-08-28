@@ -1,41 +1,54 @@
-name: Create Resources
+name: Delete Resources
 
 on:
   workflow_dispatch:
 
 jobs:
-  setup_env:
-    uses: ./.github/workflows/setup-env.yml
-
-  create:
-    needs: setup_env
+  delete:
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      S3_BUCKET: ${{ needs.setup_env.outputs.S3_BUCKET }}
-      S3_KEY_PATH: ${{ needs.setup_env.outputs.S3_KEY_PATH }}
-      API_GATEWAY_NAME: ${{ needs.setup_env.outputs.API_GATEWAY_NAME }}
-      API_STAGE_NAME: ${{ needs.setup_env.outputs.API_STAGE_NAME }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Source Environment Variables from env.sh
+        run: |
+          source .github/workflows/env.sh
+          echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
+          echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Source Variables from terraform.tfvars
+        id: source_tfvars
+        run: |
+          # Read variables from terraform.tfvars
+          export $(grep -v '^#' terraform.tfvars | xargs)
+
+          # Save the variables to GitHub environment
+          echo "LAMBDA_FUNCTION_NAME=${lambda_function_name}" >> $GITHUB_ENV
+          echo "API_GATEWAY_NAME=${api_gateway_name}" >> $GITHUB_ENV
+          echo "API_STAGE_NAME=${api_stage_name}" >> $GITHUB_ENV
+
+      - name: Debug Variables from terraform.tfvars
+        run: |
+          echo "Lambda Function Name: ${LAMBDA_FUNCTION_NAME}"
+          echo "API Gateway Name: ${API_GATEWAY_NAME}"
+          echo "API Stage Name: ${API_STAGE_NAME}"
+
       - name: Initialize Terraform
         run: |
           terraform init \
-            -backend-config="key=${S3_KEY_PATH}/terraform.tfstate" \
+            -backend-config="key=${PROJECT_NAME}/terraform.tfstate" \
             -backend-config="bucket=${S3_BUCKET}" \
             -backend-config="region=${AWS_REGION}"
         working-directory: ./terraform
 
-      - name: Apply Terraform to create resources
-        run: terraform apply -auto-approve
+      - name: Destroy Terraform Resources
+        run: terraform destroy -auto-approve
         working-directory: ./terraform
-
-      - name: Save API Endpoint to S3
-        run: |
-          echo $API_ENDPOINT > api_endpoint.txt
-          aws s3 cp api_endpoint.txt s3://${S3_BUCKET}/${S3_KEY_PATH}/api_endpoint.txt
