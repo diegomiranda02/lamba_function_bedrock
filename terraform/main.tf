@@ -85,7 +85,7 @@ resource "aws_apigatewayv2_stage" "api_stage" {
 resource "aws_lambda_permission" "apigw_lambda_permission" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda_function_name
+  function_name = aws_lambda_function.lambda_function.function_name  # Corrected reference
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.api_gateway.execution_arn}/*/*"
 }
