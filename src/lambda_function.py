@@ -49,7 +49,7 @@ def lambda_handler(event, context):
         if 'prompt' not in params:
             return {
                 'statusCode': 400,
-                'body': json.dumps({'error': "Prompt is missing"})
+                'body': json.dumps({'error': "Prompt is missing."})
             }
 
         # Call model_invocation with model_id and the params dictionary
