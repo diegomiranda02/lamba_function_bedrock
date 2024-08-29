@@ -60,4 +60,10 @@ jobs:
           BASE_API_ENDPOINT=$(echo $API_ENDPOINT | sed 's/::.*//')
     
           echo "Base API Endpoint: ${BASE_API_ENDPOINT}"
+          
+          # Store the BASE_API_ENDPOINT value in a file
+          echo "${BASE_API_ENDPOINT}" > base_api_endpoint.txt
+
+          # Upload the file to S3
+          aws s3 cp base_api_endpoint.txt s3://${S3_BUCKET}/base_api_endpoint.txt
         working-directory: ./terraform
