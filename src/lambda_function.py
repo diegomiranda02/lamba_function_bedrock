@@ -43,7 +43,7 @@ def lambda_handler(event, context):
             print("Event does not contain 'body'. Full event:", event)
             return {
                 'statusCode': 400,
-                'body': json.dumps({'error': "Request body is missing or invalid!"})
+                'body': json.dumps({'error': "Request body is missing or invalid."})
             }
 
         if 'prompt' not in params:
