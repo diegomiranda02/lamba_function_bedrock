@@ -45,6 +45,11 @@ jobs:
       - name: Extract Project Name
         run: echo "PROJECT_NAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)" >> $GITHUB_ENV
 
+      - name: Verify Lambda Function Exists
+        run: |
+          aws lambda get-function --function-name $PROJECT_NAME --region $AWS_REGION || (echo "Error: Lambda function $PROJECT_NAME was not created." >&2 && exit 1)
+        shell: bash
+
       - name: Package Lambda function
         run: |
           mkdir -p package
