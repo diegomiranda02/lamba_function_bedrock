@@ -60,3 +60,10 @@ jobs:
       - name: Apply Terraform to create resources
         run: terraform apply -auto-approve terraform.plan
         working-directory: ./terraform
+
+      - name: Output API Endpoint
+        id: output_endpoint
+        run: |
+          API_ENDPOINT=$(terraform output -raw api_endpoint)
+          echo "API_ENDPOINT=${API_ENDPOINT}" >> $GITHUB_ENV
+          echo "API Endpoint: ${API_ENDPOINT}"
