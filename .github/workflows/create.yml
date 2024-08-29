@@ -56,4 +56,8 @@ jobs:
         run: |
           API_ENDPOINT=$(terraform output -raw api_endpoint)
           echo "API Endpoint: ${API_ENDPOINT}"
+          # Ensure the API endpoint is clean and only includes what is expected
+          BASE_API_ENDPOINT=$(echo $API_ENDPOINT | sed 's/::.*//')
+    
+          echo "Base API Endpoint: ${BASE_API_ENDPOINT}"
         working-directory: ./terraform
