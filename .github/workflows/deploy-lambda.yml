@@ -15,18 +15,11 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  setup_env:
-    uses: ./.github/workflows/setup-env.yml
-
   deploy:
-    needs: setup_env
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      S3_BUCKET: ${{ needs.setup_env.outputs.S3_BUCKET }}
-      S3_KEY_PATH: ${{ needs.setup_env.outputs.S3_KEY_PATH }}
 
     steps:
       - name: Checkout code
@@ -36,6 +29,21 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
+          
+      - name: Source Environment Variables
+        run: |
+          source .github/workflows/env.sh
+          echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
+          echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Debug Environment Variables
+        run: |
+          echo "S3_BUCKET=${S3_BUCKET}"
+          echo "AWS_REGION=${AWS_REGION}"
+
+      - name: Extract Project Name
+        run: echo "PROJECT_NAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)" >> $GITHUB_ENV
 
       - name: Package Lambda function
         run: |
@@ -48,7 +56,7 @@ jobs:
       - name: Deploy Lambda function
         run: |
           aws lambda update-function-code \
-            --function-name lambda_function_bedrock \
+            --function-name $PROJECT_NAME \
             --zip-file fileb://function.zip \
             --region $AWS_REGION \
             --debug 2>&1 | tee debug.log
@@ -61,9 +69,6 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      S3_BUCKET: ${{ needs.setup_env.outputs.S3_BUCKET }}
-      S3_KEY_PATH: ${{ needs.setup_env.outputs.S3_KEY_PATH }}
 
     steps:
       - name: Checkout code
