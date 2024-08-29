@@ -91,7 +91,7 @@ jobs:
 
       - name: Retrieve API Endpoint from S3
         run: |
-          aws s3 cp s3://${S3_BUCKET}/${S3_KEY_PATH}/api_endpoint.txt .
+          aws s3 cp s3://${S3_BUCKET}/${PROJECT_NAME}/api_endpoint.txt .
           if [ -f api_endpoint.txt ]; then
             echo "API_ENDPOINT=$(cat api_endpoint.txt)" >> $GITHUB_ENV
           else
