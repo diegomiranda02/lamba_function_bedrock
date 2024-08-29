@@ -1,7 +1,6 @@
-variable "lambda_function_name" {
+variable "project_name" {
   type        = string
-  description = "The name of the Lambda function"
-  default     = "lambda_function_bedrock"
+  description = "The name of the GitHub project"
 }
 
 variable "api_gateway_name" {
