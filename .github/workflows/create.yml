@@ -45,7 +45,7 @@ jobs:
         working-directory: ./terraform
 
       - name: Plan Terraform Deployment
-        run: terraform plan -out=terraform.plan
+        run: terraform plan -var="project_name=${PROJECT_NAME}" -out=terraform.plan
         working-directory: ./terraform
 
       - name: Apply Terraform to create resources
