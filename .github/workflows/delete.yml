@@ -32,11 +32,6 @@ jobs:
       - name: Extract Project Name
         run: echo "PROJECT_NAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)" >> $GITHUB_ENV
 
-      - name: Delete API Endpoint from S3
-        run: |
-          aws s3 rm s3://${S3_BUCKET}/${PROJECT_NAME}/base_api_endpoint.txt
-        shell: bash
-
       - name: Initialize Terraform
         run: |
           terraform init \
@@ -48,3 +43,8 @@ jobs:
       - name: Destroy Terraform Resources
         run: terraform destroy -auto-approve
         working-directory: ./terraform
+
+      - name: Delete API Endpoint from S3
+        run: |
+          aws s3 rm s3://${S3_BUCKET}/${PROJECT_NAME}/base_api_endpoint.txt
+        shell: bash
