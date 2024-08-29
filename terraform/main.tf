@@ -60,18 +60,18 @@ resource "aws_apigatewayv2_api" "api_gateway" {
   protocol_type = "HTTP"
 }
 
-# Create API Gateway route
-resource "aws_apigatewayv2_route" "api_route" {
-  api_id    = aws_apigatewayv2_api.api_gateway.id
-  route_key = "POST /{proxy+}"
-  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
-}
-
 # Integrate Lambda with API Gateway
 resource "aws_apigatewayv2_integration" "lambda_integration" {
   api_id           = aws_apigatewayv2_api.api_gateway.id
   integration_type = "AWS_PROXY"
   integration_uri  = aws_lambda_function.lambda_function.invoke_arn
+}
+
+# Create API Gateway route
+resource "aws_apigatewayv2_route" "api_route" {
+  api_id    = aws_apigatewayv2_api.api_gateway.id
+  route_key = "POST /{proxy+}"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
 # Deploy API
@@ -90,6 +90,8 @@ resource "aws_lambda_permission" "apigw_lambda_permission" {
   source_arn    = "${aws_apigatewayv2_api.api_gateway.execution_arn}/*/*"
 }
 
-output "api_endpoint" {
-  value = aws_apigatewayv2_api.api_gateway.api_endpoint
+# Output the full API endpoint URL
+output "api_full_url" {
+  value       = "${aws_apigatewayv2_api.api_gateway.api_endpoint}/${aws_apigatewayv2_stage.api_stage.name}/POST/{proxy+}"
+  description = "The full API Gateway endpoint including the stage and route."
 }
