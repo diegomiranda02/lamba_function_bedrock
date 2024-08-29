@@ -92,6 +92,6 @@ resource "aws_lambda_permission" "apigw_lambda_permission" {
 
 # Output the full API endpoint URL
 output "api_full_url" {
-  value       = "${aws_apigatewayv2_api.api_gateway.api_endpoint}/${aws_apigatewayv2_stage.api_stage.name}/POST/{proxy+}"
+  value       = "${aws_apigatewayv2_api.api_gateway.api_endpoint}/$var.api_stage_name/${var.api_gateway_name}/"
   description = "The full API Gateway endpoint including the stage and route."
 }
