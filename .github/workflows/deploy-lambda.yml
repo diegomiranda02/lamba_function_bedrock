@@ -87,8 +87,13 @@ jobs:
       - name: Retrieve API Endpoint from S3
         run: |
           aws s3 cp s3://${S3_BUCKET}/${S3_KEY_PATH}/api_endpoint.txt .
-          echo "API_ENDPOINT=$(cat api_endpoint.txt)" >> $GITHUB_ENV
-
+          if [ -f api_endpoint.txt ]; then
+            echo "API_ENDPOINT=$(cat api_endpoint.txt)" >> $GITHUB_ENV
+          else
+            echo "Error: API endpoint file not found" >&2
+            exit 1
+          fi
+        shell: bash
       - name: Run Lambda Function Test
         run: |
           python ./src/test/test_lambda_function.py --endpoint $API_ENDPOINT
