@@ -65,5 +65,5 @@ jobs:
           echo "${BASE_API_ENDPOINT}" > base_api_endpoint.txt
 
           # Upload the file to S3
-          aws s3 cp base_api_endpoint.txt s3://${S3_BUCKET}/base_api_endpoint.txt
+          aws s3 cp base_api_endpoint.txt s3://${S3_BUCKET}/${PROJECT_NAME}/base_api_endpoint.txt
         working-directory: ./terraform
