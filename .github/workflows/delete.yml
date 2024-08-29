@@ -41,7 +41,7 @@ jobs:
         working-directory: ./terraform
 
       - name: Destroy Terraform Resources
-        run: terraform destroy -auto-approve
+        run: terraform destroy -var="project_name=${PROJECT_NAME}" -auto-approve
         working-directory: ./terraform
 
       - name: Delete API Endpoint from S3
