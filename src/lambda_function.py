@@ -27,7 +27,7 @@ def model_invocation(model_id: str, params: dict) -> str:
         return result
         
     except Exception as e:
-        exception_message = f"Error generating the blog: {e}"
+        exception_message = f"Error generating the response: {e}"
         print(exception_message)
         return exception_message
 
