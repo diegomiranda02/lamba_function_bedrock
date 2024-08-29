@@ -56,9 +56,13 @@ jobs:
         run: |
           API_ENDPOINT=$(terraform output -raw api_endpoint)
           echo "API Endpoint: ${API_ENDPOINT}"
-          # Ensure the API endpoint is clean and only includes what is expected
-          BASE_API_ENDPOINT=$(echo $API_ENDPOINT | sed 's/::.*//')
-    
+      
+          # Extract everything starting from 'https://'
+          BASE_API_ENDPOINT=$(echo $API_ENDPOINT | sed -n 's/.*\(https:\/\/.*\)/\1/p')
+
+          # Ensure the BASE_API_ENDPOINT is clean and only includes what is expected
+          BASE_API_ENDPOINT=$(echo $BASE_API_ENDPOINT | sed 's/::.*//')
+          
           echo "Base API Endpoint: ${BASE_API_ENDPOINT}"
           
           # Store the BASE_API_ENDPOINT value in a file
