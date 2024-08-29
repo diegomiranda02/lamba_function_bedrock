@@ -16,39 +16,21 @@ jobs:
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.0  # Specify the Terraform version you need
 
-      - name: Source Environment Variables from env.sh
+      - name: Source Environment Variables
         run: |
           source .github/workflows/env.sh
           echo "S3_BUCKET=$S3_BUCKET" >> $GITHUB_ENV
           echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
         shell: bash
 
+      - name: Debug Environment Variables
+        run: |
+          echo "S3_BUCKET=${S3_BUCKET}"
+          echo "AWS_REGION=${AWS_REGION}"
+
       - name: Extract Project Name
-        id: extract_project_name
-        run: |
-          PROJECT_NAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
-          PROJECT_NAME=${PROJECT_NAME//\//}  # Remove any slashes
-          echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
-
-      - name: Source Variables from terraform.tfvars
-        id: source_tfvars
-        run: |
-          # Read variables from terraform.tfvars
-          export $(grep -v '^#' terraform.tfvars | xargs)
-
-          # Save the variables to GitHub environment
-          echo "LAMBDA_FUNCTION_NAME=${lambda_function_name}" >> $GITHUB_ENV
-          echo "API_GATEWAY_NAME=${api_gateway_name}" >> $GITHUB_ENV
-          echo "API_STAGE_NAME=${api_stage_name}" >> $GITHUB_ENV
-
-      - name: Debug Variables from terraform.tfvars
-        run: |
-          echo "Lambda Function Name: ${LAMBDA_FUNCTION_NAME}"
-          echo "API Gateway Name: ${API_GATEWAY_NAME}"
-          echo "API Stage Name: ${API_STAGE_NAME}"
+        run: echo "PROJECT_NAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)" >> $GITHUB_ENV
 
       - name: Initialize Terraform
         run: |
@@ -56,7 +38,7 @@ jobs:
             -backend-config="key=${PROJECT_NAME}/terraform.tfstate" \
             -backend-config="bucket=${S3_BUCKET}" \
             -backend-config="region=${AWS_REGION}"
-        shell: bash
+        working-directory: ./terraform
 
       - name: Validate Terraform Configuration
         run: terraform validate
@@ -70,9 +52,8 @@ jobs:
         run: terraform apply -auto-approve terraform.plan
         working-directory: ./terraform
 
-      - name: Output API Endpoint
-        id: output_endpoint
+      - name: Output and Print API Endpoint
         run: |
           API_ENDPOINT=$(terraform output -raw api_endpoint)
-          echo "API_ENDPOINT=${API_ENDPOINT}" >> $GITHUB_ENV
           echo "API Endpoint: ${API_ENDPOINT}"
+        working-directory: ./terraform
