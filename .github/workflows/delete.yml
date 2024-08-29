@@ -40,14 +40,11 @@ jobs:
           echo "API_GATEWAY_NAME=${api_gateway_name}" >> $GITHUB_ENV
           echo "API_STAGE_NAME=${api_stage_name}" >> $GITHUB_ENV
 
-      - name: Debug Environment Variables
+      - name: Debug Variables from terraform.tfvars
         run: |
-          echo "PROJECT_NAME=${PROJECT_NAME}"
-          echo "S3_BUCKET=${S3_BUCKET}"
-          echo "AWS_REGION=${AWS_REGION}"
-          echo "Lambda Function Name: ${lambda_function_name}"
-          echo "API Gateway Name: ${api_gateway_name}"
-          echo "API Stage Name: ${api_stage_name}"
+          echo "Lambda Function Name: ${LAMBDA_FUNCTION_NAME}"
+          echo "API Gateway Name: ${API_GATEWAY_NAME}"
+          echo "API Stage Name: ${API_STAGE_NAME}"
 
       - name: Initialize Terraform
         run: |
