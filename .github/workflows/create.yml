@@ -24,6 +24,13 @@ jobs:
           echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
         shell: bash
 
+      - name: Extract Project Name
+        id: extract_project_name
+        run: |
+          PROJECT_NAME=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
+          PROJECT_NAME=${PROJECT_NAME//\//}  # Remove any slashes
+          echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_ENV
+
       - name: Source Variables from terraform.tfvars
         id: source_tfvars
         run: |
@@ -47,7 +54,13 @@ jobs:
             -backend-config="key=${PROJECT_NAME}/terraform.tfstate" \
             -backend-config="bucket=${S3_BUCKET}" \
             -backend-config="region=${AWS_REGION}"
-        working-directory: ./terraform
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          TERRAFORM_CLI_PATH: /home/runner/work/_temp/terraform-cli
+          S3_BUCKET: ${{ env.S3_BUCKET }}
+          AWS_REGION: ${{ env.AWS_REGION }}
 
       - name: Validate Terraform Configuration
         run: terraform validate
