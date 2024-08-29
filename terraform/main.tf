@@ -47,7 +47,7 @@ data "archive_file" "lambda_zip" {
 
 resource "aws_lambda_function" "lambda_function" {
   filename         = data.archive_file.lambda_zip.output_path
-  function_name    = var.lambda_function_name  # Use variable
+  function_name    = var.project_name  # Use variable
   role             = aws_iam_role.lambda_exec_role.arn
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.12"
