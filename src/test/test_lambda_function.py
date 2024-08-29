@@ -34,7 +34,7 @@ def already_response_function(prompt: str, url: str):
 def test_already_response_1():
     url = os.getenv("API_ENDPOINT")  # Get the endpoint URL from the environment variable
     if not url:
-        raise ValueError("API_ENDPOINT environment variable is not set.")
+        raise ValueError("API_ENDPOINT environment variable is not set!")
     
     prompt = ("""
     Você é um classificador de chamados do sistema de gerenciamento de chamados GLPI. Classifique o chamado em categoria e subcategoria de acordo com as seguintes opções:
