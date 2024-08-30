@@ -14,3 +14,9 @@ variable "api_stage_name" {
   description = "The name of the API Gateway stage"
   default     = "dev"
 }
+
+variable "lambda_timeout" {
+  type        = number
+  description = "The timeout for the Lambda function in seconds"
+  default     = 240  # Default to 4 minutes
+}
