@@ -15,7 +15,7 @@ variable "api_stage_name" {
   default     = "dev"
 }
 
-variable "lambda_timeout" {
+variable "lambda_function_timeout" {
   type        = number
   description = "The timeout for the Lambda function in seconds"
   default     = 240  # Default to 4 minutes
