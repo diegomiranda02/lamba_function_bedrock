@@ -52,6 +52,7 @@ resource "aws_lambda_function" "lambda_function" {
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.12"
   source_code_hash = filebase64sha256(data.archive_file.lambda_zip.output_path)
+  timeout          = var.lambda_function_timeout
 }
 
 # Create API Gateway
